@@ -19,12 +19,18 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.teamcode.drive.opmode.Autonomous.StageSwitchingPipeline;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -55,11 +61,24 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1;
+    public static double LATERAL_MULTIPLIER = 1.4920121658;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
+
+    public double leftPower = 0.0;
+    public double rightPower = 0.0;
+    public double drive1 = 0.0;
+    public double drive2 = 0.0;
+
+    private LinearOpMode opMode;
+
+    public static final double AMAX_POS = 0.50;     // Maximum rotational position ---- Phil Claw: 1.4; GoBilda Claw: 1.4
+    public static final double AMIN_POS = 0.25;     // Minimum rotational position ---- Phil Claw: 0.7; GoBilda Claw: 0.61
+
+    public static final double CLAW_OPEN_SETTING = AMAX_POS;
+    public static final double CLAW_CLOSED_SETTING = AMIN_POS;
 
     private TrajectorySequenceRunner trajectorySequenceRunner;
 
@@ -68,14 +87,16 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private TrajectoryFollower follower;
 
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    private DcMotorEx leftFront, leftRear, rightRear, rightFront, slideLeft, slideRight, turret;
+    private Servo Claw;
     private List<DcMotorEx> motors;
 
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
 
-    public SampleMecanumDrive(HardwareMap hardwareMap) {
+    public SampleMecanumDrive(LinearOpMode opMode, HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
+        this.opMode = opMode;
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
@@ -88,11 +109,6 @@ public class SampleMecanumDrive extends MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
 
         // TODO: If the hub containing the IMU you are using is mounted so that the "REV" logo does
         // not face up, remap the IMU axes so that the z-axis points upward (normal to the floor.)
@@ -116,10 +132,16 @@ public class SampleMecanumDrive extends MecanumDrive {
         // For example, if +Y in this diagram faces downwards, you would use AxisDirection.NEG_Y.
         // BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_Y);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "frontLeft");
+        leftRear = hardwareMap.get(DcMotorEx.class, "backLeft");
+        rightRear = hardwareMap.get(DcMotorEx.class, "backRight");
+        rightFront = hardwareMap.get(DcMotorEx.class, "frontRight");
+
+        slideLeft = hardwareMap.get(DcMotorEx.class, "slideLeft");
+        slideRight = hardwareMap.get(DcMotorEx.class, "slideRight");
+        turret = hardwareMap.get(DcMotorEx.class, "turret");
+
+        Claw = hardwareMap.get(Servo.class, "Claw");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -140,9 +162,11 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
+        setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
@@ -202,6 +226,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         waitForIdle();
     }
 
+    public void breakFollowing() {
+        trajectorySequenceRunner.breakFollowing();
+    }
+
     public Pose2d getLastError() {
         return trajectorySequenceRunner.getLastPoseError();
     }
@@ -225,12 +253,18 @@ public class SampleMecanumDrive extends MecanumDrive {
         for (DcMotorEx motor : motors) {
             motor.setMode(runMode);
         }
+        slideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
         for (DcMotorEx motor : motors) {
             motor.setZeroPowerBehavior(zeroPowerBehavior);
         }
+        slideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void setPIDFCoefficients(DcMotor.RunMode runMode, PIDFCoefficients coefficients) {
@@ -293,7 +327,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return imu.getAngularOrientation().firstAngle;
+        return 0;
     }
 
     @Override
@@ -310,5 +344,221 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
+    }
+
+    public void stop() {
+        if (leftFront != null && rightFront != null && leftRear != null && rightRear != null) {
+            leftFront.setPower(0);
+            rightFront.setPower(0);
+            leftRear.setPower(0);
+            rightRear.setPower(0);
+            this.leftFront.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            this.rightFront.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            this.leftRear.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            this.rightRear.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    /* NON RR METHODS */
+
+    public void moveSlidesAndTurret(double slideHeight, double slidePower, int turretPos, double turretSpeed) {
+
+        slideLeft.setTargetPosition((int) slideHeight);
+        slideRight.setTargetPosition((int) -slideHeight);
+        turret.setTargetPosition(turretPos);
+
+        slideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        /* while (slideLeft.getCurrentPosition() != slideHeight && turret.getCurrentPosition() != turretPos) {
+
+        }
+
+         */
+
+        // move slides
+        if (slideLeft.getCurrentPosition() < slideHeight) {
+            slideLeft.setPower(0.6 * slidePower);
+            slideRight.setPower(-0.6 * slidePower);
+        }
+        else if (slideLeft.getCurrentPosition() > slideHeight) {
+            slideLeft.setPower(-0.6 * slidePower);
+            slideRight.setPower(0.6 * slidePower);
+        }
+
+        //move turret
+        if (turret.getCurrentPosition() > turretPos)
+            turret.setPower(turretSpeed);
+        else if (turret.getCurrentPosition() < turretPos)
+            turret.setPower(turretSpeed);
+    }
+
+
+    public void strafeJunction(boolean leftOrRight,
+                                  double maxDriveSpeed, StageSwitchingPipeline pipeline) { //True = left, False = right
+
+        int valMid;
+
+        // Ensure that the opmode is still active
+        if (opMode.opModeIsActive()) {
+            opMode.sleep(500);
+
+            drive1 = 0.0;
+            if (leftOrRight){
+                drive2 = maxDriveSpeed;
+            }
+            else {
+                drive2 = -maxDriveSpeed;
+            }
+            leftPower = Range.clip(drive1 + drive2, -1.0, 1.0);
+            rightPower = Range.clip(drive1 - drive2, -1.0, 1.0);
+            // Send calculated power to wheels
+            leftFront.setPower(rightPower);
+            rightFront.setPower(leftPower);
+            leftRear.setPower(leftPower);
+            rightRear.setPower(rightPower);
+
+            leftFront.setPower(leftPower);
+            rightFront.setPower(rightPower);
+            leftRear.setPower(rightPower);
+            rightRear.setPower(leftPower);
+
+            while (true) {
+                valMid = pipeline.getValMid();
+
+                leftFront.setPower(rightPower);
+                rightFront.setPower(leftPower);
+                leftRear.setPower(leftPower);
+                rightRear.setPower(rightPower);
+
+
+                if (valMid > 100) {
+                    stop();
+                    break;
+                }
+
+                opMode.telemetry.addData("valMid",  pipeline.getValMid());
+                opMode.telemetry.addData("Height", pipeline.getRows());
+                opMode.telemetry.addData("Width", pipeline.getCols());
+
+                opMode.telemetry.update();
+            }
+        }
+    }
+
+    public void strafeJunctionRoadrunner(StageSwitchingPipeline pipeline, Trajectory traj) { //True = left, False = right
+
+        int valMid;
+
+        // Ensure that the opmode is still active
+        if (opMode.opModeIsActive()) {
+            opMode.sleep(500);
+
+            followTrajectoryAsync(traj);
+
+            while (true) {
+                valMid = pipeline.getValMid();
+                opMode.telemetry.addData("valMid",  pipeline.getValMid());
+                opMode.telemetry.addData("Height", pipeline.getRows());
+                opMode.telemetry.addData("Width", pipeline.getCols());
+                opMode.telemetry.update();
+
+                if (valMid > 100) {
+                    breakFollowing();
+                    break;
+                }
+
+                opMode.telemetry.addData("valMid",  pipeline.getValMid());
+                opMode.telemetry.addData("Height", pipeline.getRows());
+                opMode.telemetry.addData("Width", pipeline.getCols());
+
+                opMode.telemetry.update();
+            }
+        }
+    }
+
+    public void openClaw() {
+        Claw.setPosition(CLAW_OPEN_SETTING);
+    }
+
+    public void closeClaw() {
+        Claw.setPosition(CLAW_CLOSED_SETTING);
+    }
+
+    public void moveSlides() {
+        double slidePower = Range.clip(opMode.gamepad2.right_stick_y, -1.0, 1.0);
+
+        //Limit how high the slides can go
+
+        if(((slideLeft.getCurrentPosition()) > 5000 && slidePower < 0) ||
+                ((slideLeft.getCurrentPosition()) < -150 && slidePower > 0)) {
+            slideLeft.setPower(0);
+            slideRight.setPower(0);
+        }
+        else if (slidePower > 0) {
+            slideLeft.setPower(-slidePower);
+            slideRight.setPower(slidePower);
+        }
+        else {
+            slideLeft.setPower(-slidePower);
+            slideRight.setPower(slidePower);
+        }
+
+        opMode.telemetry.addData("slidePower", slidePower);
+        opMode.telemetry.addData("slideLeftHeight", slideLeft.getCurrentPosition());
+        opMode.telemetry.addData("slideRightHeight", slideRight.getCurrentPosition());
+    }
+
+    public void moveTurret() throws InterruptedException {
+        double turretPower = Range.clip(opMode.gamepad2.left_stick_x, -1.0, 1.0);
+        double turretPos = turret.getCurrentPosition();
+        opMode.telemetry.addData("turretPos", turretPos);
+
+        if ((turretPos >= 850 && turretPower < -0.01) || (turretPos <= -850 && turretPower > 0.01)) {
+            turret.setPower(0);
+        }
+        else {
+            turret.setPower(-0.45 * turretPower);
+        }
+    }
+
+    public void resetSlides() {
+        slideLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        slideRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        slideLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void resetTurret() {
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void mecanumDriving() {
+        opMode.resetRuntime();
+        double drive = opMode.gamepad1.left_stick_y;
+        double strafe = opMode.gamepad1.right_stick_x;
+        double turn = opMode.gamepad1.left_stick_x;
+        double v1, v2, v3, v4;
+
+        if (opMode.gamepad1.right_bumper) {
+            v1 = Range.clip(-drive + strafe + turn, -0.2, 0.2);
+            v2 = Range.clip(-drive - strafe - turn, -0.2, 0.2);
+            v3 = Range.clip(-drive + strafe - turn, -0.2, 0.2);
+            v4 = Range.clip(-drive - strafe + turn, -0.2, 0.2);
+        }
+
+        else {
+            v1 = Range.clip(-drive + strafe + turn, -0.9, 0.9);
+            v2 = Range.clip(-drive - strafe - turn, -0.9, 0.9);
+            v3 = Range.clip(-drive + strafe - turn, -0.9, 0.9);
+            v4 = Range.clip(-drive - strafe + turn, -0.9, 0.9);
+        }
+        leftFront.setPower(v1);
+        rightFront.setPower(v2);
+        leftRear.setPower(v3);
+        rightRear.setPower(v4);
     }
 }
