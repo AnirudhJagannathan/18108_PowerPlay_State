@@ -449,7 +449,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void strafeJunctionRoadrunner(StageSwitchingPipeline pipeline, Trajectory traj) { //True = left, False = right
 
-        int valMid;
+        int localValMid;
 
         // Ensure that the opmode is still active
         if (opMode.opModeIsActive()) {
@@ -458,14 +458,15 @@ public class SampleMecanumDrive extends MecanumDrive {
             followTrajectoryAsync(traj);
 
             while (true) {
-                valMid = pipeline.getValMid();
+                localValMid = pipeline.getValMid();
                 opMode.telemetry.addData("valMid",  pipeline.getValMid());
                 opMode.telemetry.addData("Height", pipeline.getRows());
                 opMode.telemetry.addData("Width", pipeline.getCols());
                 opMode.telemetry.update();
 
-                if (valMid > 100) {
+                if (localValMid > 100) {
                     breakFollowing();
+                    setDrivePower(new Pose2d());
                     break;
                 }
 
@@ -475,6 +476,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
                 opMode.telemetry.update();
             }
+            update();
         }
     }
 

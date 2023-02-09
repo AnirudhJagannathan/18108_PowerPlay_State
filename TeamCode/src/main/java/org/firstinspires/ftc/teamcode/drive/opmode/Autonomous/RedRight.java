@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -245,8 +246,22 @@ public class RedRight extends LinearOpMode {
 
         /* Actually do something useful */
         if(tagOfInterest == null) {
-            drive.strafeJunctionRoadrunner(stageSwitchingPipeline, test);
+            /* drive.strafeJunctionRoadrunner(stageSwitchingPipeline, test);
             drive.followTrajectory(test2);
+
+             */
+
+            drive.followTrajectoryAsync(test);
+
+            ElapsedTime stopTimer = new ElapsedTime();
+
+            while (opModeIsActive() && !isStopRequested()) {
+                if (stopTimer.seconds() >= 3) {
+                    drive.breakFollowing();
+                    drive.setDrivePower(new Pose2d());
+                }
+            }
+            drive.update();
         }
 
         else if (tagOfInterest != null) {
