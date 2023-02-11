@@ -58,8 +58,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0.25);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0.2);
 
     public static double LATERAL_MULTIPLIER = 1.4920121658;
 
@@ -379,12 +379,12 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // move slides
         if (slideLeft.getCurrentPosition() < slideHeight) {
-            slideLeft.setPower(0.6 * slidePower);
-            slideRight.setPower(-0.6 * slidePower);
+            slideLeft.setPower(slidePower);
+            slideRight.setPower(-slidePower);
         }
         else if (slideLeft.getCurrentPosition() > slideHeight) {
-            slideLeft.setPower(-0.6 * slidePower);
-            slideRight.setPower(0.6 * slidePower);
+            slideLeft.setPower(-slidePower);
+            slideRight.setPower(slidePower);
         }
 
         //move turret

@@ -83,45 +83,48 @@ public class RedRight extends LinearOpMode {
                 .build();
 
         Trajectory traj1 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(46, -2, Math.toRadians(0)),
+                .lineToLinearHeading(new Pose2d(44, -1.75, Math.toRadians(0)),
                         SampleMecanumDrive.getVelocityConstraint(0.6 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                .lineToLinearHeading(new Pose2d(65, -7, Math.toRadians(0)),
+                .lineToLinearHeading(new Pose2d(58, -7, Math.toRadians(0)),
                         SampleMecanumDrive.getVelocityConstraint(0.8 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Trajectory traj2_5 = drive.trajectoryBuilder(traj2.end())
-                .lineToLinearHeading(new Pose2d(55, -9, Math.toRadians(0)),
+        TrajectorySequence traj2_5 = drive.trajectorySequenceBuilder(traj2.end())
+                .lineToLinearHeading(new Pose2d(50, -9, Math.toRadians(0)),
                         SampleMecanumDrive.getVelocityConstraint(0.8 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .lineToLinearHeading(new Pose2d(52, -9, Math.toRadians(-90)),
+                        SampleMecanumDrive.getVelocityConstraint(0.8 * DriveConstants.MAX_VEL, 0.8 * DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj3 = drive.trajectoryBuilder(traj2_5.end())
-                .lineToLinearHeading(new Pose2d(55, -30, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(52, -32, Math.toRadians(-90)))
                 .build();
 
         Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
-                .lineToLinearHeading(new Pose2d(55, 2, Math.toRadians(0)),
-                        SampleMecanumDrive.getVelocityConstraint(0.6 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                .lineToLinearHeading(new Pose2d(55, 5.25, Math.toRadians(-90)),
+                        SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj5 = drive.trajectoryBuilder(traj4.end())
-                .lineToLinearHeading(new Pose2d(58, 6, Math.toRadians(0)),
-                        SampleMecanumDrive.getVelocityConstraint(0.15 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                .lineToLinearHeading(new Pose2d(52, -32, Math.toRadians(-90)),
+                        SampleMecanumDrive.getVelocityConstraint(0.8 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj6 = drive.trajectoryBuilder(traj5.end())
-                .lineToLinearHeading(new Pose2d(54, 20, Math.toRadians(-96)))
+                .lineToLinearHeading(new Pose2d(53, 20, Math.toRadians(-96)))
                 .build();
 
         Trajectory traj7 = drive.trajectoryBuilder(traj6.end())
-                .lineToLinearHeading(new Pose2d(59, -19.5, Math.toRadians(-96)),
+                .lineToLinearHeading(new Pose2d(53, -19.5, Math.toRadians(-96)),
                         SampleMecanumDrive.getVelocityConstraint(0.75 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
@@ -269,20 +272,17 @@ public class RedRight extends LinearOpMode {
             drive.resetSlides();
             drive.closeClaw();
             sleep(500);
-            drive.moveSlidesAndTurret(1050, 1.0, 440, 0.3);
+            drive.moveSlidesAndTurret(3500, 1.0, 440, 0.3);
             sleep(300);
             drive.followTrajectory(traj1);
-            drive.moveSlidesAndTurret(800, 0.4, 440, 0.3);
-            sleep(300);
             drive.openClaw();
-            drive.moveSlidesAndTurret(1050, 1.0, 440,  0.3);
             sleep(300);
             //Move to first medium junction
 
-            drive.moveSlidesAndTurret(400, 0.4, -440, 0.3);
+            drive.moveSlidesAndTurret(800, 0.4, 0, 0.3);
             drive.followTrajectory(traj2);
             sleep(350);
-            drive.followTrajectory(traj2_5);
+            drive.followTrajectorySequence(traj2_5);
             //Move forward to align with cone stack
 
             drive.followTrajectory(traj3);
@@ -290,12 +290,14 @@ public class RedRight extends LinearOpMode {
             sleep(250);
 
 
-            camera.setPipeline(stageSwitchingPipeline);
-            drive.moveSlidesAndTurret(400, 0.7, 0, 0.15);
+            drive.moveSlidesAndTurret(1800, 0.7, -440, 0.15);
             drive.followTrajectory(traj4);
-            drive.strafeJunction(true, 0.2, stageSwitchingPipeline);
+            sleep(300);
+            drive.openClaw();
+            sleep(300);
 
-            drive.moveSlidesAndTurret(2000, 0.5, 0, 0.15);
+
+            drive.moveSlidesAndTurret(800, 0.5, 0, 0.3);
             drive.followTrajectory(traj5);
             /*
             drive.openClaw();
