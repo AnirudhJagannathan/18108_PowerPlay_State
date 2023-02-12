@@ -20,10 +20,6 @@ public class TeleOp_Drive extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(this, hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        while (opModeInInit()) {
-            drive.resetTurret();
-            drive.resetSlides();
-        }
 
         waitForStart();
 
