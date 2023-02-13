@@ -42,6 +42,9 @@ public class TeleOp_Drive extends LinearOpMode {
             if (gamepad2.left_bumper)
                 drive.openClaw();
 
+            if (gamepad1.y)
+                drive.resetSlides();
+
             /*if (gamepad2.y)
                 drive.moveTurretToPosition(0);
             if(gamepad2.b)

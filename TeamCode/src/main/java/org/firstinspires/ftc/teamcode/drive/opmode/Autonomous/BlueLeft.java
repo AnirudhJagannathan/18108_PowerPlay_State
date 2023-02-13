@@ -66,6 +66,10 @@ public class BlueLeft extends LinearOpMode {
 
         telemetry.setMsTransmissionInterval(50);
 
+        Trajectory test1 = drive.trajectoryBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(48, -6, Math.toRadians(0)))
+                .build();
+
         Trajectory traj1 = drive.trajectoryBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(16.5, 0, Math.toRadians(0)),
                         SampleMecanumDrive.getVelocityConstraint(0.5 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -138,13 +142,29 @@ public class BlueLeft extends LinearOpMode {
                 .build();
 
         Trajectory middle = drive.trajectoryBuilder(traj11.end())
-                .lineToLinearHeading(new Pose2d(57, -4, Math.toRadians(90)),
+                .lineToLinearHeading(new Pose2d(57, -6, Math.toRadians(90)),
                         SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory right = drive.trajectoryBuilder(traj11.end())
                 .lineToLinearHeading(new Pose2d(53, -27, Math.toRadians(90)),
+                        SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
+                .build();
+
+        Trajectory leftTest = drive.trajectoryBuilder(test1.end())
+                .lineToLinearHeading(new Pose2d(48, 19, Math.toRadians(90)))
+                .build();
+
+        Trajectory middleTest = drive.trajectoryBuilder(test1.end())
+                .lineToLinearHeading(new Pose2d(48, -3, Math.toRadians(90)),
+                        SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
+                .build();
+
+        Trajectory rightTest = drive.trajectoryBuilder(test1.end())
+                .lineToLinearHeading(new Pose2d(48, -22, Math.toRadians(90)),
                         SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
@@ -234,7 +254,10 @@ public class BlueLeft extends LinearOpMode {
             drive.resetSlides();
             drive.closeClaw();
             sleep(500);
-            drive.moveSlidesAndTurret(2000, 1.0, -440, 0.3);
+
+            drive.followTrajectory(test1);
+
+            /* drive.moveSlidesAndTurret(2000, 1.0, -440, 0.3);
             sleep(300);
             drive.followTrajectory(traj1);
             drive.openClaw();
@@ -309,16 +332,20 @@ public class BlueLeft extends LinearOpMode {
             drive.moveSlidesAndTurret(0, 1.0, 0, 0.4);
             drive.followTrajectory(traj11);
 
+             */
+
+
+
             if(tagOfInterest.id == LEFT) {
-                drive.followTrajectory(left);
+                drive.followTrajectory(leftTest);
             }
 
             else if(tagOfInterest.id == MIDDLE) {
-                drive.followTrajectory(middle);
+                drive.followTrajectory(middleTest);
             }
 
             else if(tagOfInterest.id == RIGHT) {
-                drive.followTrajectory(right);
+                drive.followTrajectory(rightTest);
             }
 
             drive.moveSlidesAndTurret(0, 0.8, 0, 0.4);
