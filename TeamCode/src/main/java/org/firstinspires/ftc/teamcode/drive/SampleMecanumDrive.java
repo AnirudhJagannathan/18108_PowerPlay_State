@@ -432,7 +432,6 @@ public class SampleMecanumDrive extends MecanumDrive {
                 leftRear.setPower(leftPower);
                 rightRear.setPower(rightPower);
 
-
                 if (valMid > 100) {
                     stop();
                     break;
