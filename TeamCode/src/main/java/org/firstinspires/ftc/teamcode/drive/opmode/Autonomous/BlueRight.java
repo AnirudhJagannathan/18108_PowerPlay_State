@@ -83,7 +83,7 @@ public class BlueRight extends LinearOpMode {
                 .build();
 
         Trajectory traj1 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(41, -4, Math.toRadians(0)),
+                .lineToLinearHeading(new Pose2d(42, -4, Math.toRadians(0)),
                         SampleMecanumDrive.getVelocityConstraint(0.6 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -154,7 +154,7 @@ public class BlueRight extends LinearOpMode {
                 .build();
 
         TrajectorySequence left = drive.trajectorySequenceBuilder(traj8.end())
-                .lineToLinearHeading(new Pose2d(56, 21, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(56, 30, Math.toRadians(-90)),
                         SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
@@ -166,7 +166,7 @@ public class BlueRight extends LinearOpMode {
                 .build();
 
         TrajectorySequence right = drive.trajectorySequenceBuilder(traj8.end())
-                .lineToLinearHeading(new Pose2d(56, -25, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(56, -20, Math.toRadians(-90)),
                         SampleMecanumDrive.getVelocityConstraint(0.9 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();

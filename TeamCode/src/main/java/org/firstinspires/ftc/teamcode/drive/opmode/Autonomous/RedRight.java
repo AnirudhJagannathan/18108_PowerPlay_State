@@ -77,46 +77,46 @@ public class RedRight extends LinearOpMode {
                 .build();
 
         Trajectory test2 = drive.trajectoryBuilder(test.end())
-                .lineToLinearHeading(new Pose2d(2, 1, Math.toRadians(0)),
+                .lineToLinearHeading(new Pose2d(2, 1, Math.toRadians(-2)),
                         SampleMecanumDrive.getVelocityConstraint(0.1 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj1 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(41, -3, Math.toRadians(0)),
+                .lineToLinearHeading(new Pose2d(42, -3, Math.toRadians(-5)),
                         SampleMecanumDrive.getVelocityConstraint(0.6 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj1_5 = drive.trajectoryBuilder(traj1.end())
-                .lineToLinearHeading(new Pose2d(43, -1, Math.toRadians(0)),
+                .lineToLinearHeading(new Pose2d(42, -1, Math.toRadians(5)),
                         SampleMecanumDrive.getVelocityConstraint(0.45 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj2 = drive.trajectoryBuilder(traj1_5.end())
-                .lineToLinearHeading(new Pose2d(58, -7, Math.toRadians(0)),
-                        SampleMecanumDrive.getVelocityConstraint(0.8 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                .lineToLinearHeading(new Pose2d(58, -6, Math.toRadians(-5)),
+                        SampleMecanumDrive.getVelocityConstraint(0.6 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence traj2_5 = drive.trajectorySequenceBuilder(traj2.end())
-                .lineToLinearHeading(new Pose2d(51, -9, Math.toRadians(0)),
-                        SampleMecanumDrive.getVelocityConstraint(0.8 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                .lineToLinearHeading(new Pose2d(52, -6, Math.toRadians(-5 )),
+                        SampleMecanumDrive.getVelocityConstraint(0.6 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .lineToLinearHeading(new Pose2d(52, -9, Math.toRadians(-90)),
-                        SampleMecanumDrive.getVelocityConstraint(0.8 * DriveConstants.MAX_VEL, 0.6 * DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                .lineToLinearHeading(new Pose2d(53, -6, Math.toRadians(-93)),
+                        SampleMecanumDrive.getVelocityConstraint(0.6 * DriveConstants.MAX_VEL, 0.6 * DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.8 * DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj3 = drive.trajectoryBuilder(traj2_5.end())
-                .lineToLinearHeading(new Pose2d(52, -29, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(56.5, -25, Math.toRadians(-100)),
                     SampleMecanumDrive.getVelocityConstraint(0.8 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                     SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
-                .lineToLinearHeading(new Pose2d(48, 9.5, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(57, 11, Math.toRadians(-95)),
                         SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -126,13 +126,13 @@ public class RedRight extends LinearOpMode {
                 .build();
 
         Trajectory traj5 = drive.trajectoryBuilder(traj4_5.end())
-                .lineToLinearHeading(new Pose2d(52, -29, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(51, -27, Math.toRadians(-95)),
                         SampleMecanumDrive.getVelocityConstraint(0.7 *DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj6 = drive.trajectoryBuilder(traj5.end())
-                .lineToLinearHeading(new Pose2d(48, 9.5, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(50, 9, Math.toRadians(-95)),
                         SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -142,13 +142,13 @@ public class RedRight extends LinearOpMode {
                 .build();
 
         Trajectory traj7 = drive.trajectoryBuilder(traj6_5.end())
-                .lineToLinearHeading(new Pose2d(52, -29, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(47, -24.5, Math.toRadians(-90)),
                         SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
 
         Trajectory traj8 = drive.trajectoryBuilder(traj7.end())
-                .lineToLinearHeading(new Pose2d(48, 9.5, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(50, 10, Math.toRadians(-90)),
                         SampleMecanumDrive.getVelocityConstraint(0.7 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -164,13 +164,13 @@ public class RedRight extends LinearOpMode {
                 .build();
 
         TrajectorySequence middle = drive.trajectorySequenceBuilder(traj9.end())
-                .lineToLinearHeading(new Pose2d(48, -2, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(48, 3, Math.toRadians(-90)),
                         SampleMecanumDrive.getVelocityConstraint(0.9 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence right = drive.trajectorySequenceBuilder(traj9.end())
-                .lineToLinearHeading(new Pose2d(48, -26, Math.toRadians(-90)),
+                .lineToLinearHeading(new Pose2d(48, -22, Math.toRadians(-90)),
                         SampleMecanumDrive.getVelocityConstraint(0.9 * DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(0.9 * DriveConstants.MAX_ACCEL))
                 .build();
@@ -281,32 +281,33 @@ public class RedRight extends LinearOpMode {
             drive.moveSlidesAndTurret(3400, 1.0, 440, 0.3);
             drive.openClaw();
             drive.followTrajectory(traj1_5);
-            sleep(300);
+            sleep(500);
             //Move to first medium junction
 
             drive.moveSlidesAndTurret(800, 0.4, 0, 0.3);
             drive.followTrajectory(traj2);
-            sleep(350);
+            sleep(550);
             drive.followTrajectorySequence(traj2_5);
+            sleep(500);
             //Move forward to align with cone stack
 
             drive.followTrajectory(traj3);
             drive.closeClaw();
             sleep(250);
             drive.moveSlidesAndTurret(1800, 1, 0, 0.15);
-            sleep(250);
+            sleep(500);
 
 
-            drive.moveSlidesAndTurret(3500, 1, -440, 0.4);
+            drive.moveSlidesAndTurret(3600, 1, -440, 0.4);
             drive.followTrajectory(traj4);
             sleep(300);
-            drive.moveSlidesAndTurret(3300, 1, -440, 0.4);
+            drive.moveSlidesAndTurret(3400, 1, -440, 0.4);
             sleep(300);
             drive.openClaw();
             sleep(300);
             drive.followTrajectory(traj4_5);
 
-            drive.moveSlidesAndTurret(700, 1, 0, 0.3);
+            /* drive.moveSlidesAndTurret(700, 1, 0, 0.3);
             drive.followTrajectory(traj5);
             drive.closeClaw();
             sleep(250);
@@ -314,10 +315,10 @@ public class RedRight extends LinearOpMode {
             sleep(250);
             //Align with second low
 
-            drive.moveSlidesAndTurret(3500, 1, -440, 0.4);
+            drive.moveSlidesAndTurret(3600, 1, -440, 0.4);
             drive.followTrajectory(traj6);
             sleep(300);
-            drive.moveSlidesAndTurret(3300, 1, -440, 0.4);
+            drive.moveSlidesAndTurret(3400, 1, -440, 0.4);
             sleep(300);
             drive.openClaw();
             sleep(300);
@@ -332,10 +333,10 @@ public class RedRight extends LinearOpMode {
             sleep(250);
             //Deposit a cone to the medium junction
 
-            drive.moveSlidesAndTurret(3500, 1, -440, 0.4);
+            drive.moveSlidesAndTurret(3700, 1, -440, 0.4);
             drive.followTrajectory(traj8);
             sleep(300);
-            drive.moveSlidesAndTurret(3300, 1, -440, 0.4);
+            drive.moveSlidesAndTurret(3400, 1, -440, 0.4);
             sleep(300);
             drive.openClaw();
             sleep(300);
@@ -358,6 +359,8 @@ public class RedRight extends LinearOpMode {
             }
 
             drive.moveSlidesAndTurret(0, 0.8, 0, 0.4);
+
+             */
         }
     }
 
